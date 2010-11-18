@@ -1,0 +1,48 @@
+zexamples/wishlist:
+
+  1) cat data | map | sort | reduce
+    a) word count:
+       cat input.txt | tr " " "\n" | sort | uniq -c > output.txt
+
+    b) filter, group-by, count:
+       cat buzz_billboard-305.tsv | awk '$1 > 20090601' | sort -k2 | cut -f2 | uniq -c > weeks_on_billboard.txt
+
+  2) join or paste
+
+  3) chains of commands
+
+  4) optional shipping of local files for mapper or reducer
+  
+  5) proper handling of bash variables inside of mappers/reducers
+
+
+
+  1a) is the simplest possible case, and should map to the following:
+      hadoop fs -put input.txt .
+
+      hadoop jar $HADOOP_HOME/hadoop-streaming.jar \
+               -mapper 'tr " " "\n"' \
+               -reducer 'uniq -c' \
+               -input  input.txt \
+               -output output.txt 
+
+      hadoop fs -get output.txt 
+
+  1b) is slighly more complicated than 1a) and should translate to the following:
+
+	awk '$1 > 20090601' 
+
+	cut -f2 | uniq -c
+
+	hadoop fs -put buzz_billboard-305.tsv .
+
+	hadoop jar $HADOOP_HOME/hadoop-streaming.jar \
+	       # magic switches to get 2nd tab-separated field as key for shuffle
+               -mapper 'awk '\''$1 > 20090601'\''' \
+               -reducer 'cut -f2 | uniq -c' \
+               -input buzz_billboard-305.tsv \
+               -output weeks_on_billboard.txt
+
+	hadoop fs -get weeks_on_billboard.txt
+
+
