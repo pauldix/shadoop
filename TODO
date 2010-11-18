@@ -1,0 +1,4 @@
+commit example data file (jake)
+check on quote escaping in -mapper and -reducer (jake)
+check on using field other than first for key (jake)
+hunt down a bash interpreter (paul)
