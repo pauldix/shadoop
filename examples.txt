@@ -1,4 +1,7 @@
-zexamples/wishlist:
+examples/wishlist:
+
+  0) map-only jobs
+    a) cat data | grep 'pattern'
 
   1) cat data | map | sort | reduce
     a) word count:
@@ -15,7 +18,10 @@ zexamples/wishlist:
   
   5) proper handling of bash variables inside of mappers/reducers
 
+  6) convience methods, e.g. groupby
 
+
+futher details:
 
   1a) is the simplest possible case, and should map to the following:
       hadoop fs -put input.txt .
@@ -42,6 +48,15 @@ zexamples/wishlist:
                -reducer 'cut -f2 | uniq -c' \
                -input buzz_billboard-305.tsv \
                -output weeks_on_billboard.txt
+
+	# alternatively, if magic switches don't exist
+	hadoop jar $HADOOP_HOME/hadoop-streaming.jar \
+	       # magic switches to get 2nd tab-separated field as key for shuffle
+               -mapper 'awk '\''$1 > 20090601'\'' | awk '\''{print $2,$0}'\''' \
+               -reducer 'cut -f2- | cut -f2 | uniq -c' \
+               -input buzz_billboard-305.tsv \
+               -output weeks_on_billboard.txt
+
 
 	hadoop fs -get weeks_on_billboard.txt
 
